@@ -1,0 +1,201 @@
+https://www.cnblogs.com/maluning/p/8556862.html
+
+C++标准库string类型的使用和操作总结
+目录
+
+一.声明和初始化
+二.读写操作
+三.常用操作
+四.字符处理
+五.其他操作
+1.insert、assign和erase函数
+2.append和replace函数
+3.子串操作substr函数
+4.查找操作find函数
+5.比较操作compare函数
+ 
+
+正文
+
+　　string是C++标准库最重要的类型之一，string支持长度可变的字符串，其包含在string头文件中。本文摘自《C++PRIMER 第四版·特别版》和个人的一些总结。
+
+回到顶部
+一.声明和初始化
+　　声明前必须在头文件中包含<string>标准库，声明如下：
+
+string     s1;            //声明一个string对象
+string     s2[10];      //声明一个string对象的数组
+　　string类型有几种构造函数，所以其初始化方式也有以下几种：
+
+复制代码
+string    s1;                                       默认构造函数，s1为空串
+string    s2(s1);                                   将s2初始化为s1的一个副本
+string    s3("value");                              将s3初始化为一个字符串字面值副本
+string    s4(n,'c');                                将s4初始化为字符'c'的n个副本
+string    s5(s4.begin(),s4.begin()+s4.size());      将s5初始化为迭代器指向的s4的范围的内容
+string    s6(cp,n);                                 将s6初始为cp指向的数组的前n个元素的副本
+string    s7(s6,pos);                               将s7初始化为一个已存在的string对象s6从下标pos开始的字符的副本
+string    s8(s7,pos,len);                           将s8初始化为s7从下标pos开始的len个字符的副本，如果pos>s7.size()则操作未定义，无论len为多大，最多只能复制s7.size()-pos个字符
+复制代码
+ 
+
+回到顶部
+二.读写操作
+　　读写操作可用标准库的cin和cout，值得注意到是读入操作，从标准输入读取入string对象时：(1)读取并忽略开头的所有空白字符（如空格、换行符、字表符）；(2)读取字符直到再次遇到空白字符，读取终止。如果输入"  Hello  World"则屏幕上讲输出"Hello"，前后的空白被忽略。
+
+回到顶部
+三.常用操作
+　　下面列出了string对象的常用操作。
+
+复制代码
+ 
+s.empty();               如果s为空串，则返回true，否则返回false
+s.size();                返回s中字符的个数
+s[n];                    返回s中位置为n的字符，从0开始计数
+s1+s2;                   把s1和s2拼接成一个新的字符串，返回新生成的字符串
+s1=s2;                   把s1的内容替换为s2的一个副本
+s1==s2;                  比较s1和s2的内容,相等则返回true，否则返回false
+!=,<,<=,>和>=　　　　      保持这些操作符惯有的含义
+复制代码
+　　下面说明上面提到的操作值得注意的地方：
+
+　　(1)任何存储string的size操作结果的变量必须为string::size_type类型。特别说明，不要把size的返回值赋值给一个int类型，因为有时int类型的大小不足以装下size返回的值。
+
+　　(2)关系操作符!=,<,<=,>，>=比较两个对象时采用了和字典排序相同的策略：如果两个string对象长度不同，且短的对象和长的对象的前面部分相匹配，则短的对象小于长的对象；如果两个string对象的字符不同，则比较第一个不匹配的字符。如：
+
+/*对于下述代码有：s1<s2,s2<s3*/
+string     s1="Hello";
+string     s2="Hello World";
+string     s3="Hiya";
+　　(3)string对象的加法被定义为拼接，如把s2追加到s1的末尾可直接用s1+=s2表达式即可。当需要string对象和字符串混合拼接时，+操作符的左右操作数中必须有一个是string对象。如
+
+string    s1="hello";
+string    s2="world";
+string    s3=s1+",";             //合法
+string    s4="hello"+",";        //非法，+号两边都没有string对象
+string    s5=s1+","+"hello";     //合法，s1先和","拼接返回一个string对象，再和"hello"拼接
+string    s6="hello"+","+s2;     //非法，"hello"先和","进行+操作，两个都不是string对象
+　　(4)由(1)可知，对于string对象的下标操作符的索引（或叫下标）应使用size_type类型，以便于能遍历整个string对象。如下遍历取出string对象的所有字符：
+
+for(string::size_type ix=0;ix != s.size();ix++)
+    cout<<s[ix]<<endl;
+ 
+
+回到顶部
+四.字符处理
+　　我们经常要对string对象的单个字符进行处理，在cctype头文件中包含了各种字符操作函数。下面列出了这些函数：
+
+复制代码
+isalnum(c);            如果c是数字或字母，则为true
+isalpha(c);            如果c是字母，则为true
+iscntrl(c);            如果c是控制字符，则为true
+isdigit(c);            如果c是数字，则为true
+isgraph(c);            如果c不是空格，但可打印，则为true
+islower(c);            如果c是小写字母，则为true
+isprint(c);            如果c是可打印的字符，则为true
+ispunct(c);            如果c是标点符号，则为true
+isspace(c)；           如果c是空白字符，则为true
+isupper(c);            如果c是大写字母，则为true
+isxdigi(c);            如果c是十六进制，则为true
+tolower(c);            返回其小写字母形式
+toupper(c);            返回其大写字母形式
+复制代码
+回到顶部
+五.其他操作
+1.insert、assign和erase函数
+　　string类型支持许多容器在操作时都以迭代器为基础，很多操作函数不同容器都能使用，但是不同的容器也会根据需要对函数进行必要的添加或减少。如string和vector中很多操作都是类似的，很多函数也是相同的。如下面列出了string类型和容器类型共有的操作：
+
+　　
+
+复制代码
+s.insert(p,t);            在迭代器p所指向的元素之前插入一个值为t的元素。返回指向新插入元素的迭代器
+s.insert(p,n,t);          在迭代器p指向的元素之前插入n个值为t的元素。返回void
+s.insert(p,b,e);          在迭代器p所指向的元素之前插入迭代器b和e标记范围内的所有元素。返回void
+s.assign(b,e);            用迭代器b和e标记范围内的元素替换s。对于string类型，返回s;对于容器类型，返回void
+s.assign(n,t);            用n个t替换s。对于string类型，返回s。对于容器类型返回void
+s.erase(p);               删除迭代器p指向的元素。返回一个迭代器，指向被删除元素后面的元素
+s.erase(b,e);             删除迭代器b和e标记范围内的元素，返回一个迭代器，指向被删除元素后面的第一个元素
+复制代码
+　　下面为string类型特有的操作版本：
+
+复制代码
+s.insert(pos,n,c);                在下标为pos的元素之前插入n个字符c
+s.insert(pos,s2);                 在下标为pos的元素之前插入string对象s2的副本
+s.insert(pos,s2,pos2,len);        在下标为pos的元素之前插入s2从下标pos2开始的len个字符
+s.insert(pos,cp,len);             在下标为pos的元素之前插入cp所指向数组的前len个字符
+s.insert(pos,cp);                 在下标为pos的元素之前插入cp所指向的以空字符结束的字符串副本
+s.assign(s2);                     用s2的副本替换s
+s.assign(s2,pos2,len);            用s2从下标pos开始的len个字符替换s
+s.assign(cp,len);                 用cp所指向数组的前len个字符替换s
+s.assign(cp);                     用cp所指向的以空字符结束的字符串副本替换s
+s.erase(pos,len);                 删除从下标pos开始的len个字符
+/*除非特殊说明，上述所有操作都返回s的引用*/
+复制代码
+ 
+
+2.append和replace函数
+　　string类型提供了容器类型不支持的几种操作：append、replace、substr和一系列find函数。其中append和replace函数用于修改string对象。append操作提供了在字符串尾部插入的捷径。replace操作用于删除指定一段范围内的字符，然后在删除位置插入一组新字符，等效于调用insert和erase函数。
+
+ /*修改string对象的操作,arg在下表*/
+s.append(args);                   将args串接在s后面。返回s的引用
+s.replace(pos,len,args);          删除s中从下标pos开始的len个字符，用args指定的字符替换之，返回s的引用
+s.replace(b,e,args);              删除迭代器b和e标记的范围内所有的字符，用args替换它。返回s的引用
+　　
+
+复制代码
+/*append和replace操作的参数：args*/
+s2                       string类型的字符串
+s2,pos,lens              字符串s2从下标pos开始的lens个字符
+cp                       指针cp指向的以空字符结束的数组
+cp,len2                  cp指向的以空字符结束的数组的前len2个字符
+n,c                      字符c的n个副本
+b2,e2                    迭代器b2和e2标记范围内的所有字符
+复制代码
+ 
+
+3.子串操作substr函数
+　　使用substr操作可以在指定的string对象中检索需要的子串。
+
+s.substr(pos,n);            返回一个string类型的字符串，它包含从s从下标pos开始的n个字符
+s.substr(pos);              返回一个string类型的字符串，它包含从下标pos开始到s的末尾的所有字符
+s.substr();                 返回s的副本
+ 
+
+4.查找操作find函数
+　　string类提供了6种查找函数，每种函数以不同形式的find命名。这些操作全都返回string::size_type类型的值，以下标的形式返回匹配的位置。当没有匹配到时返回一个string::npos的特殊值。npos定义为保证大于任何有效的下标值。
+
+　　
+
+复制代码
+/*string类型的查找操作，其参数args在下表*/
+s.find(args);                     在s中查找args的第一次出现    
+s.rfind(args);                    在s中查找args的最后一次出现
+s.find_first_of(args);            在s中查找args的任意字符的第一次出现
+s.find_last_of(args);             在s中查找args的任意字符的最后一次出现
+s.find_first_not_of(args);        在s中查第一个不属于args的字符
+s.find_last_not_of(args);         在s中查找最后一一个不属于args的字符
+复制代码
+　　每个查找都有四个重载版本，如下表：
+
+c,pos                在s中，从下标pos标记的位置开始，查找字符c。pos的默认值为0
+s2,pos               在s中，从下标pos标记的位置开始，查找string对象s2。pos的默认值为0.
+cp,pos               在s中，从下标pos标记的位置开始，查找指针cp指向的一空字符结束的字符串。pos的默认值为0.
+cp,pos,n             在s中，从下标pos标记的位置开始，查找指针cp所指向的数组的前n个字符。pos的默认值为0.
+ 
+
+5.比较操作compare函数
+ 　　compare函数用于实现string类型的字典顺序的比价。compare返回下面是三种可能之一：
+
+　　(1)正数，此时s1大于args所代表的string对象。
+
+　　(2)负数，此时s1小于args所代表的string对象。
+
+　　(3)0，相等。
+
+复制代码
+s.compare(s2);                        比较s和s2
+s.compare(pos1,n1,s2);                让s中从pos1下标位置开始的n1个字符与s2做比较
+s.compare(pos1,n1,s2,pos2,n2);        让s中从pos1下标位置开始的n1个字符与s2中从pos2开始的n2个字符相比较
+s.compare(cp);                        比较s和cp所指向的以空字符结束的字符串
+s.compare(pos1,n1,cp);                让s中从pos1下标位置开始的n1个字符与cp所指向的以空字符结束的字符串比较
+s.compare(pos1,n1,cp,n2);             让s中从pos1下标位置开始的n1个字符与cp所指向的字符串的前n2个字符串比较
