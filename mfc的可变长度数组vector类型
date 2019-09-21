@@ -1,0 +1,192 @@
+1.包含头文件 ,使用命名空间
+#include<vector>
+using namespace std；
+
+2.定义和声明vector对象
+
+vector<T> v1;  //T是一种数据类型，系统定义的或者你自己定义的类，但是不能是引用，T类型的，但是没有元素
+vector<T> v2(v1);   //v1与v2必须是同类型，等同于赋值运算符，两个变量的元素一样
+vector<T> v2 = v1; //同上
+vector<T> v3(n, value) //n个重复元素 ，每个元素值都是value
+vector<T> v4(n)   //n个对象，对象的值根据类型不同而不同，自动初始化，如果是int类型，就被初始化为0；如果是字符串，就被初始化为空的字符串
+
+3.常用函数
+push_back(要加入的变量元素);//在最后面添加一个元素
+pop_back();//将最后面的元素删除，不返回元素的值
+size();//返回数组的长度
+empty();//判断数组是否为空
+==  //判断相等
+比较运算符：>=  <=
+对vector中的元素进行访问
+V1[n]; //下标访问法，0~n~size-1
+V1.at[n];  //下标访问法，0~n~size-1,使用at访问更加安全一些，因为at访问的时候将在运行期间检查非法的索引，这种检查的代价是运行时间更长
+front(); //返回最前面的一个元素
+back(); //返回最后面的一个元素
+
+可以用=将一个vector赋值给另一个vector
+///////*******///////
+总的操作函数
+//////*******////////
+用Iterator操作相关函数
+常用的有
+1.begin:iterator begin();
+
+             const_iterator begin() const;
+
+返回指向第一个元素的iterator指针
+
+2.end：用法与begin同，通常是一起使用来遍历容器中的元素
+
+返回指向最后一个元素再后面一个的iterator指针
+这2个一般用于检索vector的元素
+例如在mfc中，先
+vector<CString> v1(1,"s");//创建了一个v1的CString的数组，1个元素，为“s”
+vector<CString>::iterator Iter;//创建iterator的变量Iter
+v1.push_back("ss");//添加元素到v1的后面，变为2个元素，"s""ss"
+v1.push_back("asd");
+v1.push_back("swd");
+int i=0;
+for (Iter=v1.begin();Iter!=v1.end();Iter++)//一对v1的循环，从第一个到最后一个
+{  //循环做的事，
+	m_2+=v1[i];//m_2为一个编辑框的变量，使每一个元素都显示在编辑框上
+	m_2+=" ";
+	i++;
+}
+//////效果//////
+s ss asd swd
+///////////////
+
+capacity相关函数
+1.size:size_type size() const;
+容器中元素个数。c.size();
+
+2.max_size():size_type max_size() const;
+返回最大容量。c.maxsize();
+
+3.resize：void resize (size_type n, value_type val = value_type());
+改变容器可以容纳元素的个数为n。如果n小于当前的容器大小，则保留前面n个元素，移除后面的。如果n大于当前容器大小，就扩展容器。value是初始值，如果n大于当前容器大小，则新增加的元素的值为value，若value省略，会自动调用一个默认值。
+std::vector<int> c;
+for(int i=0;i<10;i++)
+     c.push_back(i);
+c.resize(5);
+c.resize(8,10);
+c.resize(12);
+for(int i=0;i<c.size();i++)
+    std::cout<<c[i]<<"  "；
+结果为：1  2  3  4  5  10  10  10  0  0  0  0
+
+4.capacity:size_type capacity() const;
+当前分配给容器的存储空间大小（元素个数），这并不限制容器的扩展，理论限制容器扩展大小是max_size的值
+。查看当前的存储空间
+5.empty:bool empty() const;
+返回容器是否为空while(!c.empty()){sum+=c.back();
+c.pop_back();}
+
+6.reserve:void reserve (size_type n);
+使得capacity至少能容纳n个元素。
+。可以直接设置存放几个元素，v1.reserve(15);//可放15个
+7.shrink_to_fit（C++11）:void shrink_to_fit();
+减小capacity，使其与容器大小相同
+。用于去除空格等不必要的内存空间
+
+四、元素访问相关函数
+1.[ ]操作:获取特定位置的元素。c[i]；
+2.at:reference at (size_type n);
+       const_reference at (size_type n) const;
+返回位置n处的元素。c.at(i),与c[i]差不多
+3.front:reference front();
+               const_reference front() const;
+返回容器中的第一个元素。c.front();
+4.back:reference back()
+        const_reference back() const;
+返回容器中最后一个元素。c.back();
+5.data（C++11）:value_type* data() noexcept;
+           const value_type* data() const noexcept;
+返回一个指向容器中数组的指针c.data()
+int *p=c.data();
+*p=10;
+++p;
+*p=20;
+p[2]=100;
+则c中存储的前面三个数据为10、20、100
+
+
+五、更新操作
+
+1.assign：template <class InputIterator> void assign (InputIterator first, InputIterator last);
+ void assign (size_type n, const value_type& val);
+ void assign (initializer_list<value_type> il);（C++11）
+ 给容器分配新的内容，并替换当前内容，同时修改大小,val为初始值
+std::vector<int>first;
+std::vector<int>second;
+std::vector<int>third;
+first.assign(7,100);
+std::vector<int>::iterator it;
+it=first.begin()+1;
+second.assign(it,first.end()-1);
+int myints[]={1776,7,4};
+third.assign(myints,myints+3);
+std::cout<<int(first.size())<<"  "<<int (second.size())<<"  "<<int (third.size())<<endl;
+果为：7  5  3
+2.push_back: void push_back (const value_type& val);
+在容器最后增加一个新的元素。c.push_back(n)
+3.pop_back:void pop_back();
+移除最后一个元素。c.pop_back()
+4.insert:iterator insert(iterator position,const value_type& val)：在position处插入元素val
+ void insert(iterator position,size_type n,const value_type& val):在position处插入n个元素，插入的元素值初始化为val
+void insert(iterator position,InputIterator first,InputIterator last):在position处插入数组中从first到last的元素
+vector<int> c(3,100);//100 100 100
+vector<int>::iterator it;//
+it=c.begin();//
+it=c.insert(it,200);//200 100 100 100
+c.insert(it,2,300);//300 300 200 100 100 100
+it=c.begin();//
+vector<int> d(2,400);
+c.insert(it+2,d.begin(),d.end());//300 300 400 400 200 100 100 100
+int s[]={501,502,503};
+c.insert(c.begin(),s,s+3);
+此时c中元素为：501  502  503  300  300  400  400  200  100  100  100
+
+5.erase：iterator erase(iterator position):删除position处的元素
+ iterator erase(iterator first,iterator last)：删除first到last的元素
+std::vector<int> myvector;
+for (int i=1; i<=10; i++) myvector.push_back(i);//1 2 3 4 5 6 7 8 9 10
+myvector.erase (myvector.begin()+5);//1 2 3 4 5 7 8 9 10
+myvector.erase (myvector.begin(),myvector.begin()+3);//4 5 7 8 9 10
+std::cout << "myvector contains:";
+for (unsigned i=0; i<myvector.size(); ++i)
+  std::cout << ' ' << myvector[i];
+结果为：4  5  7  8  9  10
+
+6.swap：void swap(vector &x)
+交换两个容器的内容,两个容器中的元素不一定要相等。c.swap(d);
+
+7.clear：void clear():清除容器中的所有元素。c.clear();
+8.emplace：iterator emplace(const_iterator position,args&& args):在position处插入一个新的元素。
+std::vector<int> myvector = {10,20,30};
+auto it = myvector.emplace ( myvector.begin()+1, 100 );
+myvector.emplace ( it, 200 );
+myvector.emplace ( myvector.end(), 300 );
+容器中元素为：10  200  100  20  30  300
+。和insert类似
+9.emplace_back：void emplace_back(args&& args):在最后插入一个元素
+。和push_back类似
+ 
+
+六、分配器
+
+allocator_type get_allocator() const:给容器分配空间
+
+std::vector<int> myvector;
+  int * p;
+  unsigned int i;
+  p = myvector.get_allocator().allocate(5);
+  for (i=0; i<5; i++) myvector.get_allocator().construct(&p[i],i);
+  std::cout << "The allocated array contains:";
+  for (i=0; i<5; i++) std::cout << ' ' << p[i];
+  std::cout << '\n';
+  for (i=0; i<5; i++) myvector.get_allocator().destroy(&p[i]);
+  myvector.get_allocator().deallocate(p,5)
+七、重载函数
+
+1.重载了操作符"=="  '!='  '<'  '<='  '>'  '>=':对于==来说，首先比较它们的大小，若size相等，则依次比较元素；对于其他运算符，依次比较元素。c==d;
