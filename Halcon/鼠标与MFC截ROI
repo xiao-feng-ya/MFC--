@@ -1,0 +1,34 @@
+dev_close_window ( )
+dev_open_window (0, 0, 512, 512, 'black', WindowHandle)
+#等待鼠标操作，得到鼠标的坐标和鼠标操作的是左键，中键还是右键
+#Button为1是左键，2是中键，4是右键，其他是他们的和是多个一起操作
+get_mbutton (WindowHandle, Row, Column, Button)
+#查询当前的鼠标的形状
+get_mshape (WindowHandle, Cursor)
+#查询系统可用的鼠标形状
+query_mshape (WindowHandle, ShapeNames)
+！！查询结果
+'arrow'   原鼠标图
+'default'  没变化
+'crosshair'   十字
+'text I-beam' 文本输入时的 I 形状
+'Slashed circle' 禁止符号
+'Size All'     有箭头的十字
+'Size NESW'    左斜带箭头
+'Size S'       竖直带箭头
+'Size NWSE"    右斜带箭头
+'Size WE'      水平带箭头
+'Vertical Arrow' 单箭头像上
+'Hourglass'  加载图标，圈圈
+#设置鼠标形状
+set_mshape (WindowHandle, 'crosshair')
+#在窗口里显示一个十字，用于标识圆形的圆心
+disp_cross(WindowHandle,Row,Column,200,0)
+#画圆
+disp_circle(WindowHandle,Row,Column,r)
+#画矩形
+dis_rectangle1(WindowHandle,R1,C1,R2,C2)
+#画带方向的矩形
+dis_rectangle2(WindowHandle,R,C,Phi,L1,L2)
+
+
