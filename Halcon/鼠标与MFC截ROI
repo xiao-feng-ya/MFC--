@@ -32,3 +32,105 @@ dis_rectangle1(WindowHandle,R1,C1,R2,C2)
 dis_rectangle2(WindowHandle,R,C,Phi,L1,L2)
 
 
+在MFC上的应用
+利用计时器来实现动态的画图
+先配置HALCON和相关环境和放置变量的定义
+在一个图片控件上先加载一个图
+
+CString path ;
+	char* pcsun="图片文件(*.bmp *.png *.jpg)|*.bmp;*.png;*jpg|All Files (*.*)|*.*||"; //图片文件的格式选择
+	CFileDialog readfileDlg(TRUE,NULL,NULL,0,pcsun,this); //2.构造文件对话框对象
+	if(IDOK ==readfileDlg.DoModal()) //当点击确定按钮时候，会记录文件路径
+	{
+		path = readfileDlg.GetPathName();
+	}
+	else
+	{
+		return;
+	}
+	hv_FilePath[0] =(char *)path.GetBuffer();   //涉及到数据转换、
+	//char* ch = (char*) LPCTSTR(path);另一种转换格式
+	read_image(&ho_Image,hv_FilePath);          //读取文件
+
+	CRect m_rect;                              //创建矩阵
+	GetDlgItem(IDC_STATIC)->GetWindowRect(&m_rect);  //讲图片空间的大小保存，把第1个图片控件的ID放入
+
+	HWND hwnd1= GetDlgItem(IDC_STATIC)->m_hWnd;   //把第一个图框（IDC_IMAGE_STATIC）的句柄格式转换
+	// LONG LWindowID  = (long)hwnd1;
+
+	//将图片放进图片控件里，
+	open_window(0,0,m_rect.Width(),m_rect.Height(),(long)hwnd1,"visible","",&hv_WindowHandle);//第5个位置，输入转换格式(long)hwnd1
+	HDevWindowStack::Push(hv_WindowHandle);
+	if (HDevWindowStack::IsOpen())
+		disp_obj(ho_Image, HDevWindowStack::GetActive());//显示图片
+	  set_draw(HDevWindowStack::GetActive(),"margin");//设置区域为轮廓
+		set_color(HDevWindowStack::GetActive(),"red");//设置颜色为红色
+    
+    添加一个定时器的消息函数OnTimer
+   在里面加入
+   void CshubiaoDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	switch (nIDEvent)      
+	{      
+	case 1:      
+		// 如果收到ID为1的定时器的消息则调用func1函数 
+		if (HDevWindowStack::IsOpen())
+			clear_window(hv_WindowHandle);
+		disp_obj(ho_Image, HDevWindowStack::GetActive());//显示图片
+		//查询鼠标位置
+		disp_cross(hv_WindowHandle, Row, Column, 200, 0);
+		get_mposition(hv_WindowHandle, &Row1, &Column1, &Button1);
+		s = ((Row-Row1)*(Row-Row1))+((Column-Column1)*(Column-Column1));
+		r = s.Sqrt();
+		disp_circle(hv_WindowHandle, Row, Column, r);
+    
+		break;      
+	case 2:      
+		// 如果收到ID为2的定时器的消息则调用函数      
+		   
+		break;     
+		    
+	default:      
+		break;      
+	} 
+	CDialogEx::OnTimer(nIDEvent);
+
+}
+    
+   建立一个按钮来用于画圆
+   set_color(HDevWindowStack::GetActive(),"red");
+	//等待鼠标按下
+	get_mbutton(hv_WindowHandle, &Row, &Column, &Button);
+	//鼠标按下后，不断刷新显示 由上一个鼠标按下的坐标与现在的坐标生成的圆
+	SetTimer(1,50,NULL);
+	//等待鼠标再次按下，来确认最终的圆大小
+	get_mbutton(hv_WindowHandle, &Row2, &Column2, &Button2);
+	if (Button2==1)//鼠标左键
+	{   //关闭计时器的刷新，直接显示得到的圆
+		KillTimer(1);
+		//利用显示的圆的2个坐标来生成一个区域
+		gen_circle(&Circle, Row, Column, r);
+		//可以对生成的区域进行偏移，左键按紧可以跟随移动，右键确认最后的位置且变为绿色的
+		drag_region1(Circle, &DestinationRegion, hv_WindowHandle);
+		clear_window(HDevWindowStack::GetActive());
+		set_color(HDevWindowStack::GetActive(),"green");
+		disp_obj(ho_Image, HDevWindowStack::GetActive());	
+		//DestinationRegion为最终的圆区域
+		disp_obj(DestinationRegion, HDevWindowStack::GetActive());
+		//可以添加保存该区域代码，生成一个区域用于用时直接加载
+
+	}else{
+		if (Button2==4)//鼠标右键
+		{   //取消画圆,直接在左键得到圆的基础上直接清除，显示原图
+			KillTimer(1);
+			if (HDevWindowStack::IsOpen())
+				clear_window(hv_WindowHandle);
+			disp_obj(ho_Image, HDevWindowStack::GetActive());//显示图片
+
+		}else{
+			//Button2==2;鼠标中键,未想到加什么功能，先直接清除
+			KillTimer(1);
+			clear_window(hv_WindowHandle);
+		}
+	}
