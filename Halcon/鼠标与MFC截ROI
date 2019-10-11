@@ -88,7 +88,14 @@ CString path ;
 		break;      
 	case 2:      
 		// 如果收到ID为2的定时器的消息则调用函数      
-		   
+		  if (HDevWindowStack::IsOpen())
+			clear_window(hv_WindowHandle);
+		disp_obj(ho_Image, HDevWindowStack::GetActive());//显示图片
+		//查询鼠标位置
+		disp_cross(hv_WindowHandle, Row3, Column3, 200, 0);
+		get_mposition(hv_WindowHandle, &Row4, &Column4, &Button4);
+		disp_rectangle1(hv_WindowHandle, Row3, Column3, Row4, Column4);
+ 
 		break;     
 		    
 	default:      
@@ -134,3 +141,46 @@ CString path ;
 			clear_window(hv_WindowHandle);
 		}
 	}
+
+建一个按钮来画矩形
+void CshubiaoDlg::OnBnClickedButton3()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	set_color(HDevWindowStack::GetActive(),"red");
+	//等待鼠标按下
+	get_mbutton(hv_WindowHandle, &Row3, &Column3, &Button3);
+	//鼠标按下后，不断刷新显示 由上一个鼠标按下的坐标与现在的坐标生成的圆
+	SetTimer(2,50,NULL);
+	//等待鼠标再次按下，来确认最终的圆大小
+	get_mbutton(hv_WindowHandle, &Row4, &Column4, &Button4);
+	if (Button4==1)//鼠标左键
+	{   //关闭计时器的刷新，直接显示得到的圆
+		KillTimer(2);
+		//利用显示的圆的2个坐标来生成一个区域
+		gen_rectangle1(&Rectanglez, Row3, Column3, Row4, Column4);
+		//可以对生成的区域进行偏移，左键按紧可以跟随移动，右键确认最后的位置且变为绿色的
+		drag_region1(Rectanglez, &DestinationRegion2, hv_WindowHandle);
+		clear_window(HDevWindowStack::GetActive());
+		set_color(HDevWindowStack::GetActive(),"green");
+		disp_obj(ho_Image, HDevWindowStack::GetActive());	
+		//DestinationRegion为最终的圆区域
+		disp_obj(DestinationRegion2, HDevWindowStack::GetActive());
+		//可以添加保存该区域代码，生成一个区域用于用时直接加载
+
+	}else{
+		if (Button4==4)//鼠标右键
+		{   //取消画圆,直接在左键得到圆的基础上直接清除，显示原图
+			KillTimer(2);
+			if (HDevWindowStack::IsOpen())
+				clear_window(hv_WindowHandle);
+			disp_obj(ho_Image, HDevWindowStack::GetActive());//显示图片
+
+		}else{
+			//Button2==2;鼠标中键,未想到加什么功能，先直接清除
+			KillTimer(2);
+			clear_window(hv_WindowHandle);
+		}
+	}
+
+
+}
