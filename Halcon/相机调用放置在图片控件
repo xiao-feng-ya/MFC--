@@ -1,0 +1,44 @@
+  打开一个矩阵放置HALCON窗口
+  CRect m_rect2;                              //创建矩阵
+	GetDlgItem(IDC_STATIC_BB)->GetWindowRect(&m_rect2);  //讲图片空间的大小保存，把第1个图片控件的ID放入
+	HWND hwnd2= GetDlgItem(IDC_STATIC_BB)->m_hWnd;   //把第一个图框（IDC_IMAGE_STATIC）的句柄格式转换
+  打开相机，使控件和相机的采集大小匹配
+	open_framegrabber("GigEVision", 0, 0, 0, 0, 0, 0, "progressive", -1, "default", 
+		-1, "false", "default", "0021490171f7_DahengImaging_MER50014GC", 0, -1, &AcqHandle2);
+	set_framegrabber_param(AcqHandle2, "OffsetY", 0);
+	set_framegrabber_param(AcqHandle2, "GevPersistentDefaultGateway", -7);
+	grab_image_start(AcqHandle2, -1);
+  grab_image_async(&Image2,AcqHandle,-1);
+  放置窗口
+  
+  open_window(0,0,m_rect2.Width(),m_rect2.Height(),(long)hwnd2,"visible","",&hv_WindowHandle2);//第5个位置，输入转换格式(long)hwnd1
+	HDevWindowStack::Push(hv_WindowHandle2);	
+	if (HDevWindowStack::IsOpen())
+		disp_obj(ho_Image, hv_WindowHandle2);//显示图片
+	set_draw(hv_WindowHandle2,"margin");
+	set_color(hv_WindowHandle2,"red");
+  
+  1.视频流放置采集在OnTimer函数里
+  在视频按钮放置开启计时器SetTimer(4,50,NULL);
+  在case 4:下添加
+  grab_image_async(&Image,AcqHandle2,-1);
+  clear_window(hv_WindowHandle2);
+  disp_obj(Image2,hv_WindowHandle2);
+  
+  结束添加
+  KillTimer(4);
+  close_framegrabber(AcqHandle2);
+  
+  
+  2.按钮触发
+  在按钮函数添加采集函数和图像的预处理函数
+  grab_image(&Image,AcqHandle);
+  预处理
+  scale_image(Image,&Image2,-1,255);
+  clear_window(hv_WindowHandle);
+  disp_obj(Image2,hv_WindowHandle);
+  
+  关闭相机
+  close_framegrabber(AcqHandle);
+  
+  
