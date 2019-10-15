@@ -41,4 +41,22 @@
   关闭相机
   close_framegrabber(AcqHandle);
   
+  ###
+  close_all_framegrabbers();
+  用于关闭所有当前打开的图像获取设备，
+  用于出现致命导致异常情况下使用（在无法使用close_framegrabber()下）
+  ###
+  get_framegrabber_param(AcqHandle,Param,Value)
+  查找一个图像获取设备的指定参数
+  ###
+  info_framegrabber(....)
+  从指定的图像获取设备查找信息
+  ###
+  set_framerabber_param(AcqHandle,Param,Value)
+  设置一个图像获取设备的指定参数
+  ***
+  
+  
+  
+  
   
