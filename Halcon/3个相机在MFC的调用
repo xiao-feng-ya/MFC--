@@ -1,0 +1,262 @@
+//相机的参数
+ Hobject  Image1,Image2,Image3;
+ HTuple  AcqHandle1,AcqHandle2,AcqHandle3;
+ HTuple  hv_WindowHandle1,hv_WindowHandle2,hv_WindowHandle3;
+ //相机视频流是否打开与关闭的辅助判断
+ bool camera1ontime=FALSE,camera2ontime=FALSE,camera3ontime=FALSE;
+ //halcon窗口打开和关闭的 标识
+ bool HalconW1=FALSE,HalconW2=FALSE,HalconW3=FALSE;
+ 
+ 建立3个Check Box控件，变量m_check1,m_check2,m_check3;
+ 
+ 初始化按钮
+  //第一个相机是否选中
+	if (1==m_check1.GetCheck())
+    {
+		Icamera1();
+
+    } 
+    else
+    {
+		MessageBox("1号没选中");
+    }
+	//第2个相机是否选中
+	if (1==m_check2.GetCheck())
+	{
+		Icamera2();
+	} 
+	else
+	{
+		MessageBox("2号没选中");
+	}
+	//第3 个相机是否选中
+	if (1==m_check3.GetCheck())
+	{
+		Icamera3();
+	} 
+	else
+	{
+		MessageBox("3号没选中");
+	}
+  
+  视频流按钮
+  //第一个相机是否选中
+	if (1==m_check1.GetCheck())
+	{		
+		//开始视频流
+		camera1ontime=TRUE;//辅助标记视频流打开
+		SetTimer(1,50,NULL);
+	} 
+	else
+	{
+		
+	}
+
+	//第2个相机是否选中
+	if (1==m_check2.GetCheck())
+	{
+		//开始视频流
+		camera2ontime=TRUE;//辅助标记视频流打开
+		SetTimer(2,50,NULL);
+	} 
+	else
+	{
+		
+	}
+	//第3 个相机是否选中
+	if (1==m_check3.GetCheck())
+	{
+		camera3ontime=TRUE;
+		SetTimer(3,50,NULL);
+	} 
+	else
+	{
+		
+	}
+  定义3个函数
+  //初始化相机1号，放置图片控件和HALCON窗口与相机的放置
+void CcodeDlg::Icamera1()
+{
+	CRect m_rect1;                              //创建矩阵
+	GetDlgItem(IDC_STATIC_1)->GetWindowRect(&m_rect1);  //讲图片空间的大小保存，把第1个图片控件的ID放入
+	HWND hwnd1= GetDlgItem(IDC_STATIC_1)->m_hWnd;   //把第一个图框（IDC_IMAGE_STATIC）的句柄格式转换
+	//打开相机，使控件和相机的采集大小匹配
+
+	//更换相机用haclon的助手调用
+	open_framegrabber("GigEVision", 0, 0, 0, 0, 0, 0, "progressive", -1, "default", 
+		-1, "false", "default", "0021490171f7_DahengImaging_MER50014GC", 0, -1, &AcqHandle1);
+	//
+
+	grab_image_start(AcqHandle1, -1);
+    grab_image_async(&Image1, AcqHandle1, -1);	
+	//放置窗口
+	HalconW1=TRUE;//标识打开窗口1
+	open_window(0,0,m_rect1.Width(),m_rect1.Height(),(long)hwnd1,"visible","",&hv_WindowHandle1);//第5个位置，输入转换格式(long)hwnd1
+	HDevWindowStack::Push(hv_WindowHandle1);	
+	if (HDevWindowStack::IsOpen())
+		disp_obj(Image1, hv_WindowHandle1);//显示图片
+	    set_draw(hv_WindowHandle1,"margin");
+	    set_color(hv_WindowHandle1,"red");
+
+	
+}
+//初始化相机2号，放置图片控件和HALCON窗口与相机的放置
+//跟换相机只要更改open_framegrabber,相机的参数更改用HALCON里的助手直接得到
+void CcodeDlg::Icamera2()
+{
+	CRect m_rect2;                              //创建矩阵
+	GetDlgItem(IDC_STATIC_2)->GetWindowRect(&m_rect2);  //讲图片空间的大小保存，把第1个图片控件的ID放入
+	HWND hwnd2= GetDlgItem(IDC_STATIC_2)->m_hWnd;   //把第一个图框（IDC_IMAGE_STATIC）的句柄格式转换
+	//打开相机，使控件和相机的采集大小匹配
+
+	//open_framegrabber用HALCON获取带入
+	//
+	open_framegrabber("GigEVision", 0, 0, 0, 0, 0, 0, "progressive", -1, "default", 
+		-1, "false", "default", "0021490171f7_DahengImaging_MER50014GC", 0, -1, &AcqHandle2);
+	//
+	grab_image_start(AcqHandle2, -1);
+	grab_image_async(&Image2, AcqHandle2, -1);	
+	//放置窗口
+	HalconW2=TRUE;//标识打开窗口2
+	open_window(0,0,m_rect2.Width(),m_rect2.Height(),(long)hwnd2,"visible","",&hv_WindowHandle2);//第5个位置，输入转换格式(long)hwnd1
+	HDevWindowStack::Push(hv_WindowHandle2);	
+	if (HDevWindowStack::IsOpen())
+		disp_obj(Image2, hv_WindowHandle2);//显示图片
+	set_draw(hv_WindowHandle2,"margin");
+	set_color(hv_WindowHandle2,"red");
+}//初始化相机3号，放置图片控件和HALCON窗口与相机的放置
+void CcodeDlg::Icamera3()
+{
+	CRect m_rect3;                              //创建矩阵
+	GetDlgItem(IDC_STATIC_3)->GetWindowRect(&m_rect3);  //讲图片空间的大小保存，把第1个图片控件的ID放入
+	HWND hwnd3= GetDlgItem(IDC_STATIC_3)->m_hWnd;   //把第一个图框（IDC_IMAGE_STATIC）的句柄格式转换
+	//打开相机，使控件和相机的采集大小匹配
+	open_framegrabber("GigEVision", 0, 0, 0, 0, 0, 0, "progressive", -1, "default", 
+		-1, "false", "default", "0021490171f7_DahengImaging_MER50014GC", 0, -1, &AcqHandle3);
+	//
+	grab_image_start(AcqHandle3, -1);
+	grab_image_async(&Image3, AcqHandle3, -1);	
+	//放置窗口
+	HalconW3=TRUE;//标识打开窗口3
+	open_window(0,0,m_rect3.Width(),m_rect3.Height(),(long)hwnd3,"visible","",&hv_WindowHandle3);//第5个位置，输入转换格式(long)hwnd1
+	HDevWindowStack::Push(hv_WindowHandle3);	
+	if (HDevWindowStack::IsOpen())
+		disp_obj(Image3, hv_WindowHandle3);//显示图片
+	set_draw(hv_WindowHandle3,"margin");
+	set_color(hv_WindowHandle3,"red");
+}
+
+  拍照按钮
+  // 1号相机
+	if (1==m_check1.GetCheck())
+	{
+	    if (camera1ontime==TRUE)
+	  {
+		KillTimer(1);
+		camera1ontime=FALSE;
+	  }
+	  grab_image(&Image1,AcqHandle1);
+	  scale_image(Image1,&Image1,-1,255);
+	  clear_window(hv_WindowHandle1);
+	  disp_obj(Image1,hv_WindowHandle1);
+	}
+	//2号相机
+	if (1==m_check2.GetCheck())
+	{
+		if (camera2ontime==TRUE)
+		{
+			KillTimer(2);
+			camera2ontime=FALSE;
+		}
+		grab_image(&Image2,AcqHandle2);
+		scale_image(Image2,&Image2,-1,255);
+		clear_window(hv_WindowHandle2);
+		disp_obj(Image2,hv_WindowHandle2);
+	}
+	//3号相机
+	if (1==m_check3.GetCheck())
+	{
+		if (camera3ontime==TRUE)
+		{
+			KillTimer(3);
+			camera3ontime=FALSE;
+		}
+		grab_image(&Image3,AcqHandle3);
+		scale_image(Image3,&Image3,-1,255);
+		clear_window(hv_WindowHandle3);
+		disp_obj(Image3,hv_WindowHandle3);
+	}
+  
+  OnTimer函数
+  void CcodeDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	switch (nIDEvent)      
+	{      
+	case 1: 
+		// 一号相机视频流的采集，可加预处理     
+		grab_image_async(&Image1,AcqHandle1,-1);
+		clear_window(hv_WindowHandle1);
+		disp_obj(Image1,hv_WindowHandle1);
+		break;      
+	case 2:      
+		// 如果收到ID为2的定时器的消息则调用函数      
+		grab_image_async(&Image2,AcqHandle2,-1);
+		clear_window(hv_WindowHandle2);
+		disp_obj(Image2,hv_WindowHandle2);   
+		break;     
+	case 3:
+		grab_image_async(&Image3,AcqHandle3,-1);
+		clear_window(hv_WindowHandle3);
+		disp_obj(Image3,hv_WindowHandle3);  
+		break;
+	default:      
+		break;      
+	}      
+	CDialogEx::OnTimer(nIDEvent);
+}
+关闭相机
+// 1号相机
+	if (camera1ontime==TRUE)
+	{
+		KillTimer(1);
+		camera1ontime=FALSE;
+	}
+	if (HalconW1==TRUE)
+	{
+		if (HDevWindowStack::IsOpen())
+		clear_window(hv_WindowHandle1);
+	    close_window(hv_WindowHandle1);
+		HalconW1=FALSE;
+	}
+	
+	//2号相机
+	if (camera2ontime==TRUE)
+	{
+		KillTimer(2);
+		camera2ontime=FALSE;
+	}
+	if(HalconW2==TRUE)
+	{
+		if (HDevWindowStack::IsOpen())
+			clear_window(hv_WindowHandle2);
+			close_window(hv_WindowHandle2);
+		HalconW2=FALSE;
+	}
+	
+	//3号相机
+	if (camera3ontime==TRUE)
+	{
+		KillTimer(3);
+		camera3ontime=FALSE;
+	}
+	if(HalconW3==TRUE)
+	{
+		if (HDevWindowStack::IsOpen())
+			clear_window(hv_WindowHandle3);
+			close_window(hv_WindowHandle3);
+		HalconW3=FALSE;
+	}
+
+    close_all_framegrabbers();//关闭全部相机
+  
