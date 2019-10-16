@@ -1,0 +1,70 @@
+预处理
+decompose3 (Image, Image1, Image2, Image3)
+ scale_image (Image3, ImageScaled,1.5, 0)
+
+创建模板
+*   gen_rectangle1 (ROI_0, 521.5, 1216.5, 621.5, 1313.5)
+*   reduce_domain(ImageScaled, ROI_0, ImageReduced)
+* create_shape_model (ImageReduced, 'auto', 0, 6.29, 'auto', 'auto', 'ignore_local_polarity', 'auto', 'auto', ModelID)
+详情（https://blog.csdn.net/maweifei/article/details/78188993）
+AngleStart：开始角度
+AngleExtent：角度的范围（一般转一圈，0-6.28）
+Metric：. 参数Metric定义了在图像中匹配模板的条件。如果Metric= 'use_polarity'，图像中的目标必须和模型具有一样的对比度。
+例如，如果模型是一个亮的目标在一个暗的背景上，那么仅仅那些比背景亮的目标可以找到。如果Metric= 'ignore_global_polarity',
+在两者对比度完全相反时也能找到目标。在上面的例子中，如果目标是比背景暗的也能将目标找到。find_shape_model函数的运行时间在这种情况下将会略微增加。
+如果Metric= ignore_local_polarity', 即使局部对比度改变也能找到模型。例如，当目标包含一部分中等灰度，并且其中部分比较亮部分比较暗时，
+这种模式是非常有用的。由于这种模式下find_shape_model函数的运行时间显著增加，最好的方法是使用create_shape_model创建几个反映目标可能的对比度变化的
+模型，同时使用find_shape_models去匹配他们。上面三个metrics仅仅适用于单通道图像。如果是多通道图像作为模板图像或搜索图像，仅仅第一个通道被使用。
+如果Metric='ignore_color_polarity', 即使颜色对比度局部变化也能找到模型。例如，当目标的部分区域颜色发生变化(e.g.从红到绿)的情况。
+如果不能提前知道目标在哪一个通道是可见的这种模式是非常有用的。在这种情况下find_shape_model函数的运行时间也会急剧增。
+'ignore_color_polarity'可以使用于具有任意通道数目的图像中。如果使用于单通道图像，他的效果和'ignore_loc al_polarity'是完全相同的。
+
+ModelID:句柄
+
+
+把模板写成文件形式
+*   write_shape_model (ModelID, '0.shm')
+
+读取模板
+ read_shape_model ('1.shm', ModelID)
+ 
+ 模板匹配
+find_shape_model (ImageScaled, ModelID, 0, 6.29, 0.67, 1000, 0.6, 'least_squares_very_high', 0, 0.75, rowpoint, columpoint, Angle, Score)
+
+详情（https://blog.csdn.net/u013698770/article/details/52198568）
+角度一般跟创建模板时一样
+MinScore：要找到的匹配度最小数值。
+NumMatches：允许找到的数量最大值。
+MaxOverlap：最大重叠度。
+SubPixel：亚像素精度
+       SubPixel确定找到的目标是否使用亚像素精度提取。如果其值为‘none’或者‘false’，模板位置仅仅是像素精度和在create_shape_model中定义的角度分辨率。
+       如果其值为 ‘interpolation’或‘true’，位置和角度都是亚像素精度的。在这种模式下模板的位姿是在匹配分数函数中插值运算得到的。
+       但是，在精度要求极高的应用中，模板的位姿应该通过最小二乘法确定，即模板点到相关图像点的距离最小。
+       其值分别有'least_squares', 'least_squares_high', 'least_squares_very_high'。其级别越高，耗时越长。一般情况下，使用’least_squares’能达到
+       时间和精度的平衡[1]。如果目标相对于模板稍微有形变，其匹配的分值会较低。对于这样的目标，可在参数SubPixel额外传递一个最大允许目标变形的参数，
+       ‘max_deformation 1’，字符串中的数值是0到32之间的整数值。0代表不允许变形。较高的最大允许变形值导致运行时长的增加且及承担了更高的匹配错误的风险。
+       因此，最大变形应该选择尽可能的小。为了获取一个有意义的分数值以及避免匹配错误，推荐把允许变量和最小二乘法联合使用[1]。
+
+NumLevels:是在搜索时使用的金字塔级别。当NumLevels=0时，使用创建模板时的金字塔级别。另外，NumLevels还可以包含第二个参数，这个参数定义了找到匹配模板。
+    例如：NumLevels=[4,2]表示在第4层开始匹配，在第2层找到匹配（其默认值为1）。可以使用这种方式降低运行时间，但是这种模式下的位姿参数是精度较低的[1]。
+    如果输入图像质量太差，例如失焦，变形，噪声等，导致边缘信息丢失或变形，通常在最低金字塔层找不到匹配目标。然而，其边缘信息可能在更高的金字塔级别上是
+    足够的[1]。另外，不同图像间，金字塔级别可能略有不同。为了方便对质量较差的图像匹配，在匹配时可以确定最低的金字塔级别。这里的技巧是，最低金字塔层可
+    用负数指明。例如，如果NumLevels为[4,-2]，匹配从第4层金字塔开始，跟踪到最低金字塔级别。如果在这层金字塔找不到匹配目标，继续降低金字塔级别进行搜索，
+    把找到至少一个匹配目标的金字塔级别最为最低金字塔级别，并返回找到的目标[1]。
+Greediness:搜索方式0，使用一个安全的启发式搜索，该方式总能找到模板，但耗时较长。一般情况下，将Greediness=0.9，这样几乎所有的情况，总能够找到模板[1]。
+Score：相似度
+
+
+
+tuple_length(Score,countobject)
+ tuple_sort_index(columpoint,Indices)
+  dev_display (Image)
+  dev_set_line_width(3)
+
+   for index := 0 to countobject-1 by 1
+       disp_circle(WH2, rowpoint[Indices[index]], columpoint[Indices[index]],7)
+*      set_tposition (WH2, rowpoint[Indices[index]]+10, columpoint[Indices[index]])
+*      write_string(WH2, index)        
+    
+   endfor    
+
