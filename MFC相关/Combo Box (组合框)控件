@@ -1,0 +1,338 @@
+（一）设置控件风格
+
+如图1所示，通过Styles(外观)选项卡中的Type属性可以设置组合框控件风格。组合框分为3种风格，即：
+
+1. Simple：包含一个编辑框和一个总是显示的列表框
+
+2. DropDown：在单击下拉箭头后才弹出列表框，这种风格的组合框的编辑框可编辑
+
+3. DropList：在单击下拉箭头后才弹出列表框，这种风格的组合框的编辑框是只读的 
+
+ 
+
+（二）调整列表部分的显示大小
+
+在使用组合框控件时，如果不经过调整，控件的列表框非常小，只能显示一项，操作不方便。需要调整显示的大小。
+
+长度调整：选中控件，拖拽右边框至合适的长度即可；
+
+高度调整：单击 下拉箭头 拖拽下边框只合适的高度即可。 
+
+ 
+
+ (三) 添加数据
+
+网上介绍可以直接通过属性窗口中的Data选项卡，向列表框中添加数据，编程工具是VC6.0，我没有验证过。我在VS2010上好像不能通过属性窗口为控件赋初值（只是自己没有实现）。现通过代码实现来为控件赋初值。
+
+通过下面的例子简要说明如何利用 MFC CComboBox Class来操作字符串列表。
+1、定义控件对应变量
+添加控件对应变量，如：CComboBox  m_cbExamble;
+
+2、向控件添加 Items
+1) 在Combo Box控件属性的Data标签里面添加，一行表示Combo Box下拉列表中的一行。换行用ctrl+回车。（这种方法我在VS2010没有实现）
+2) 利用函数 AddString() 向 Combo Box 控件添加 Items，如：
+//向组合框中添加Items
+
+m_cbExamble.AddString(_T("StringData1"));
+
+m_cbExamble.AddString(_T("StringData2"));
+
+m_cbExamble.AddString(_T("StringData3"));
+3) 也可以调用函数 InsertString() 将 Item 插入指定位置 nIndex，如：
+//将 Item 插入指定位置 nIndex
+
+m_cbExamble.InsertString( /*nIndex*/1, _T("StringData222222222")); 
+
+3、从控件得到选定的Item
+假设在控件列表中已经选定某项，现在要得到被选定项的内容，首先要得到该项的位置，然后得到对应位置的内容。这里会用到两个函数，如：处理组合框的CBN_SELCHANGE消息，当在组合框的列表框部分选择一项时，弹出消息框显示列表项的数据。为组合框控件条件消息响应事件，CBN_SELCHANGE消息，下图所示：
+
+
+
+图2 组合框控件条件消息响应事件
+
+代码如下：
+
+void CComboxTestDlg::OnCbnSelchangeCombo1()
+{
+//获得当前选择的列表项索引
+int nIndex = m_cbExamble.GetCurSel();
+CString strCBText;
+//根据指定的索引获得该项的数据
+m_cbExamble.GetLBText( nIndex, strCBText);
+MessageBox(strCBText);
+}
+这样，得到的内容就保存在 strCBText 中。
+
+注意：因为组合框是由一个编辑框和一个列表框组合而成，所以也可以使用(strCBText)方法直接获得组合框中当前显示的数据。 
+
+4、在控件中查找给定Item
+这种操作一般用于在程序中动态修改控件中该项的值，可以用函数FindStringExact() 精确匹配，如：
+int nIndex = m_cbExamble.FindStringExact( nStartAfter, “value to be found”);
+nStartAfter指明从哪一行开始查找。如果查找成功，返回的是该项的位置；否则，返回CB_ERR。 
+
+//向组合框中添加Items
+m_cbExamble.AddString(_T("StringData1"));
+m_cbExamble.AddString(_T("StringData2"));
+m_cbExamble.AddString(_T("StringData3"));
+//将 Item 插入指定位置 nIndex
+m_cbExamble.InsertString( /*nIndex*/1, _T("StringData222222222"));
+//查找列表项数据为StringData1的项
+int nIndex = m_cbExamble.FindStringExact( /*nStartAfter*/0,_T("StringData2"));
+//nIndex 返回值为2
+也可以选中包含指定字符串的项，如：
+int nIndex = m_cbExamble.SelectString( nStartAfter, “value to be selected”);
+
+代码如下：
+
+void CComboxTestDlg::OnCbnSelchangeCombo1()
+{
+//获得当前选择的列表项索引
+int nIndex = m_cbExamble.GetCurSel();
+CString strCBText;
+//根据指定的索引获得该项的数据
+m_cbExamble.GetLBText( nIndex, strCBText);
+//查找列表项数据为StringData1的项
+int nIndex2 = m_cbExamble.FindStringExact( /*nStartAfter*/0,strCBText);
+CString str;
+str.Format(_T("%d"),nIndex2);
+//输出选中项的索引
+MessageBox(str);
+} 
+结果如下图所示
+
+
+
+图3 查找列表项中某项对应的索引
+
+5、删除控件中的Item
+该操作可以利用函数DeleteString()，需要指定被删除项的位置，如：
+m_cbExamble.DeleteString(nIndex);
+也可以使用函数ResetContent()，清除目前的所有项，如：
+m_cbExamble.ResetContent();
+
+这个比较简单，不必作示例介绍。
+
+
+
+6、显示控件中的某项
+int nIndex = m_cbExamble.GetCurSel(); //当前选中的项
+m_cbExamble.SetCurSel(nIndex); //设置第nIndex项为显示的内容
+
+
+7、得到或设置输入框中被选中的字符位置
+DWORD GetEditSel( ) /BOOL SetEditSel( int nStartChar, int nEndChar );
+BOOL LimitText( int nMaxChars ); 设置输入框中可输入的最大字符数。
+
+
+8、列表框常用消息映射宏
+ON_CBN_DBLCLK 鼠标双击
+ON_CBN_DROPDOWN 列表框被弹出
+ON_CBN_KILLFOCUS / ON_CBN_SETFOCUS 在输入框失去/得到输入焦点时产生
+ON_CBN_SELCHANGE 列表框中选择的行发生改变
+ON_CBN_EDITUPDATE 输入框中内容被更新 
+
+补充：
+
+一、如何添加/删除Combo Box内容
+1、在Combo Box控件属性的Data标签里面添加，一行表示Combo Box下拉列表中的一行。换行用ctrl+回车。
+
+2、在程序初始化时动态添加
+如： //控件内容初始化
+CString strTemp;
+
+//消除现有所有内容 清空组合框数据
+
+((CComboBox*)GetDlgItem(IDC_COMBO_CF))->ResetContent();
+
+for(int i=1;i<=100;i++)
+
+{
+
+strTemp.Format(_T("%d"),i);
+
+((CComboBox*)GetDlgItem(IDC_COMBO_CF))->AddString(strTemp);
+
+}
+
+ 
+
+3、下拉的时候添加
+如： 
+
+CString strTemp;
+
+//取得目前已经有的行数
+int iCount=((CComboBox*)GetDlgItem(IDC_COMBO_CF))->GetCount();
+
+if(iCount<1)//防止重复多次添加
+{
+((CComboBox*)GetDlgItem(IDC_COMBO_CF))->ResetContent();
+for(int i=1;i<=100;i++)
+{
+strTemp.Format("%d",i);
+((CComboBox*)GetDlgItem(IDC_COMBO_CF))->AddString(strTemp);
+}
+}
+
+
+4、删除
+DeleteString( UINT nIndex )//删除指定行.
+
+
+5、插入
+InsertString( int nIndex, LPCTSTR lpszItem )//将行插入到指定位置
+
+
+6、查找
+
+//可以在当前所有行中查找指定的字符传的位置
+
+//nStartAfter指明从那一行开始进行查找
+FindString( int nStartAfter, LPCTSTR lpszItem )
+
+//可以选中包含指定字符串的行
+
+int SelectString( int nStartAfter, LPCTSTR lpszItem )
+
+
+7、选择其中的某行
+7.1选中
+
+//当前选中的行
+int iPos=((CComboBox*)GetDlgItem(IDC_COMBO_CF))->GetCurSel();
+
+7.2设置
+
+//设置第n行内容为显示的内容
+((CComboBox*)GetDlgItem(IDC_COMBO_CF))->SetCurSel(n)
+取得Combo Box框内容
+1取当前内容
+((CComboBox*)GetDlgItem(IDC_COMBO_CF))->GetWindowText(strTemp);
+2取其他行内容
+((CComboBox*)GetDlgItem(IDC_COMBO_CF))->GetLBText(n,strTemp);
+
+
+8、获得焦点
+通常要判断控件是否获得了焦点，可以用GetFocus()函数
+例如：if(GetFocus()==GetDlgItem(IDC_EDIT_VALUE2))//判断焦点是否在编辑框IDC_EDIT_VALUE2内。
+但是combobox 的焦点不同，因为它是由edit和listbox两部分组成的
+所以获得焦点要用GetParent()：if ((GetFocus()->GetParent())==GetDlgItem(IDC_COMBO_CF))
+
+
+9、控制Combo Box的下拉长度
+9.1.点击一下Combo Box的下拉箭头，此时出现的调整框就是Combo Box的下拉调整框。
+9.2.属性里有个 No integral height 钩选项，表示最大长度为设计长度，如果实际内容比设计长度多，就出现滚动条，少就以实际长度显示。
+
+
+二、VC++ Combo Box/Combo Box Ex控件
+
+　　组合窗口是由一个输入框和一个列表框组成。创建一个组合窗口可以使用成员函数：
+BOOL CListBox::Create( LPCTSTR lpszText, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID = 0xffff );
+其中dwStyle将指明该窗口的风格，除了子窗口常用的风格WS_CHILD,WS_VISIBLE外，你可以针对列表控件指明专门的风格。
+CBS_DROPDOWN  下拉式组合框
+CBS_DROPDOWNLIST  下拉式组合框，但是输入框内不能进行输入
+CBS_SIMPLE  输入框和列表框同时被显示
+LBS_SORT  所有的行按照字母顺序进行排序
+
+
+由于组合框内包含了列表框，所以列表框的功能都能够使用，如可以利用：
+int AddString( LPCTSTR lpszItem );添加行
+
+
+int DeleteString( UINT nIndex );删除指定行
+
+
+int InsertString( int nIndex, LPCTSTR lpszItem );将行插入到指定位置
+
+
+void ResetContent( );可以删除列表框中所有行
+
+
+int GetCount( );得到当前列表框中行的数量
+
+
+int GetCurSel( )/int SetCurSel(int iIndex);得到/设置当前被选中的行的位置
+
+ 
+
+int GetLBText( int nIndex, LPTSTR lpszText );得到列表框内指定行的字符串
+
+
+int FindString( int nStartAfter, LPCTSTR lpszItem );在当前所有行中查找指定的字符传的位置，nStartAfter指明从那一行开始进行查找
+
+
+int SelectString( int nStartAfter, LPCTSTR lpszItem );可以选中包含指定字符串的行
+
+
+此外输入框的功能都能够使用，如可以利用：
+DWORD GetEditSel( ) /BOOL SetEditSel( int nStartChar, int nEndChar )得到或设置输入框中被选中的字符位置
+
+
+BOOL LimitText( int nMaxChars )设置输入框中可输入的最大字符数。
+输入框的剪贴板功能Copy,Clear,Cut,Paste动可以使用。
+
+
+最后介绍一下列表框几种常用的消息映射宏：
+ON_CBN_DBLCLK  鼠标双击
+ON_CBN_DROPDOWN  列表框被弹出
+ON_CBN_KILLFOCUS / ON_CBN_SETFOCUS 在输入框失去/得到输入焦点时产生
+ON_CBN_SELCHANGE  列表框中选择的行发生改变
+ON_CBN_EDITUPDATE  输入框中内容被更新
+
+
+使用以上几种消息映射的方法为定义原型如：afx_msg void memberFxn( );的函数，并且定义形式如ON_Notification( id, memberFxn )的消息映射。如果在对话框中使用组合框，Class Wizard会自动列出相关的消息，并能自动产生消息映射代码。
+
+ 
+
+在MFC 4.2中对组合框进行了增强，你可以在组合框中使用ImageList，有一个新的类CComboBoxEx（由CComboBox派生）来实现这一功能。
+
+在CComboBoxEx类中添加了一些新的成员函数来实现新的功能：首先你需要调用CImageList* SetImageList( CImageList* pImageList );来设置ImageList，然后调用
+int InsertItem( const COMBOBOXEXITEM* pCBItem );
+
+来添加行，
+
+其中COMBOBOXEXITEM定义如下：
+typedef struct { 
+
+UINT mask; 
+
+int iItem; 
+
+LPTSTR pszText; 
+
+int cchTextMax; 
+
+int iImage; 
+
+int iSelectedImage; 
+
+int iOverlay; 
+
+int iIndent; 
+
+LPARAM lParam;
+
+} COMBOBOXEXITEM, *PCOMBOBOXEXITEM;
+
+你需要设置mask=CBEIF_IMAGECBEIF_TEXT，并设置iItem为插入位置，设置pszText为显示字符串，设置iImage为显示的图标索引。下面的代码演示了如何进行插入：
+ 
+m_list.Create(IDB_IMG,16,4,RGB(0,0,0));
+
+m_cbeWnd.SetImageList(&m_list);
+
+COMBOBOXEXITEM insItem;
+
+insItem.mask=CBEIF_IMAGECBEIF_TEXT;insItem.iItem=0; 
+
+insItem.iImage=0;insItem.pszText=_T("Line 1");
+
+m_cbeWnd.InsertItem(&insItem);
+
+insItem.iItem=1;insItem.iImage=1;
+
+insItem.pszText=_T("Line 2");
+
+m_cbeWnd.InsertItem(&insItem);
+
+通过调用int DeleteItem( int iIndex );来删除行，并指明行的位置。
+通过调用BOOL GetItem( COMBOBOXEXITEM* pCBItem )/BOOL SetItem( const COMBOBOXEXITEM* pCBItem );来得到/设置行数据。
