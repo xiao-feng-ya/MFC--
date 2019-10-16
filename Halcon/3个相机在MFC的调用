@@ -7,73 +7,54 @@
  //halcon窗口打开和关闭的 标识
  bool HalconW1=FALSE,HalconW2=FALSE,HalconW3=FALSE;
  
- 建立3个Check Box控件，变量m_check1,m_check2,m_check3;
+ 建立3个Check Box控件，变量m_check1,m_check2,m_check3;// 一号相机复选框的变量
+	CButton m_check1;
+	// 第2个相机的复选框变量
+	CButton m_check2;
+	// 第3个相机的复选框变量
+	CButton m_check3;
  
  初始化按钮
   //第一个相机是否选中
 	if (1==m_check1.GetCheck())
-    {
-		Icamera1();
-
-    } 
-    else
-    {
-		MessageBox("1号没选中");
-    }
+        {		Icamera1();         } 
+    else{	MessageBox("1号没选中");    }
 	//第2个相机是否选中
 	if (1==m_check2.GetCheck())
-	{
-		Icamera2();
-	} 
-	else
-	{
-		MessageBox("2号没选中");
-	}
+	{	Icamera2();              } 
+    else
+	{		MessageBox("2号没选中");	}
 	//第3 个相机是否选中
 	if (1==m_check3.GetCheck())
-	{
-		Icamera3();
-	} 
-	else
-	{
-		MessageBox("3号没选中");
-	}
+	{		Icamera3();	} 
+    else
+	{		MessageBox("3号没选中");	}
   
   视频流按钮
   //第一个相机是否选中
 	if (1==m_check1.GetCheck())
-	{		
-		//开始视频流
+	{	//开始视频流
 		camera1ontime=TRUE;//辅助标记视频流打开
-		SetTimer(1,50,NULL);
-	} 
-	else
-	{
-		
-	}
+		SetTimer(1,50,NULL);	} 
+	else{	}
 
-	//第2个相机是否选中
+  //第2个相机是否选中
 	if (1==m_check2.GetCheck())
-	{
-		//开始视频流
+	{//开始视频流
 		camera2ontime=TRUE;//辅助标记视频流打开
-		SetTimer(2,50,NULL);
-	} 
-	else
-	{
-		
-	}
+		SetTimer(2,50,NULL);} 
+	else{    }
 	//第3 个相机是否选中
 	if (1==m_check3.GetCheck())
-	{
-		camera3ontime=TRUE;
-		SetTimer(3,50,NULL);
-	} 
-	else
-	{
-		
-	}
+	{      camera3ontime=TRUE;
+		SetTimer(3,50,NULL);	} 
+	else{  }
+  
+  
   定义3个函数
+void Icamera1();//初始化相机1,
+void Icamera2();//初始化相机2，
+void Icamera3();//初始化相机3，
   //初始化相机1号，放置图片控件和HALCON窗口与相机的放置
 void CcodeDlg::Icamera1()
 {
@@ -186,6 +167,7 @@ void CcodeDlg::Icamera3()
 		clear_window(hv_WindowHandle3);
 		disp_obj(Image3,hv_WindowHandle3);
 	}
+  
   
   OnTimer函数
   void CcodeDlg::OnTimer(UINT_PTR nIDEvent)
