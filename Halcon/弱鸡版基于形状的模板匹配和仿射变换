@@ -68,3 +68,22 @@ tuple_length(Score,countobject)
     
    endfor    
 
+
+
+仿射变换
+
+创建矩阵
+1.
+vector_angle_to_rigid（起始点行，起始点列，起始点角度，变换后行，变换后列，变换后角度：矩阵HomMat2D）
+
+2.
+ hom_mat2d_identity (HomMat2DIdentity)   生成2D变换的齐次变换矩阵。
+ hom_mat2d_rotate (HomMat2DIdentity,Angle,,Row Column, HomMat2DRotate)  平移旋转 （R和C是平移旋转中心点）
+ hom_mat2d_scale (HomMat2DIdentity,行缩放比例 , 列缩放比列, Row, Column, HomMat2DScale)  缩放 （R和C是缩放中心点）
+ 
+ 变换
+ affine_trans_contour_xld（原XLD轮廓，ContoursAffinTrans，HomMat2D）  XLD变换
+ affine_trans_region (原区域, RegionAffineTrans, HomMat2DRotate, 'nearest_neighbor'（插值方法，10版只有选择是否插值）)  区域变换
+ 
+ 
+
