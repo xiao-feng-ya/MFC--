@@ -1,0 +1,5 @@
+先选择要添加的控件
+在属性的外观的Notify改为ture
+在控制事件里添加响应函数
+STN_DBLCLK(双击响应）
+STN_CLICLK(单击响应）
