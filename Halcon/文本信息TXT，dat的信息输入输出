@@ -24,3 +24,7 @@
 	UpdateData(FALSE);
   
   
+fread_string(...)用于直接读，读取到空格或者换行符 停止。
+fread_line(...)用于读取一行，如果有换行符，一并读取。
+list_files(...)读取某文件夹下的所有文件路径
+list_image_files(...)读取某文件夹下的图片路径
