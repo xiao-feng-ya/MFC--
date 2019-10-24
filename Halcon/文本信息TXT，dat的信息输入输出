@@ -28,3 +28,49 @@ fread_string(...)用于直接读，读取到空格或者换行符 停止。
 fread_line(...)用于读取一行，如果有换行符，一并读取。
 list_files(...)读取某文件夹下的所有文件路径
 list_image_files(...)读取某文件夹下的图片路径
+
+
+* 'input'：将已存在的输入文件以ASCII格式打开以供读取。该文件打开以后，将不能再往里面写东西。
+ 2 * 'output'：将打开一个新的输出文件，以便以ASCII格式写入。如果有同名文件，则原文件将先被删除。
+ 3 * 'append'：将已存在的输出文件在文件末尾打开，以便以ASCII格式追加写入。
+ 4 
+ 5 path := '1.txt'
+ 6 
+ 7 open_file (path, 'output', FileHandle)
+ 8 
+ 9 fwrite_string (FileHandle, 'Hello')
+10 fwrite_string (FileHandle, ',world')
+11 fnew_line (FileHandle)
+12 fnew_line (FileHandle)
+13 fwrite_string (FileHandle, '886')
+14 
+15 close_file (FileHandle)
+16 
+17 
+18 open_file (path, 'input', FileHandle)
+19 
+20 * fread_char是一次读取一个字符。如果一直重复读到末尾，Char的值为'eof'（结束标记）
+21 * fread_line读取一整行的内容，可能会含有换行标记
+22 * 可以分别取消下面两行代码的注释，观察读到了什么内容
+23 * fread_char (FileHandle, Char)
+24 * fread_line (FileHandle, OutLine, IsEOF)
+25 
+26 * 注意，读文本内容时，剩余可读的东西是越读越少的
+27 * fread_string也是读取一行的文本，但是不包含换行标记
+28 fread_string (FileHandle, OutString1, IsEOF1)
+29 fread_string (FileHandle, OutString2, IsEOF2)
+30 
+31 close_file (FileHandle)
+32 
+33 
+34 * 判断文件是否存在并删除文件
+35 file_exists (path, FileExists)
+36 if (FileExists)
+37     open_file (path, 'input', FileHandle)
+38     fread_string (FileHandle, OutString3, IsEOF3)
+39     close_file (FileHandle)
+40     delete_file（path）
+ 41 endif
+ 
+  parse_filename (ImageFiles[0], BaseName, Extension, Directory)
+  将一个文件的路径，分解为，文件名，文件类型，文件所在夹的路径
