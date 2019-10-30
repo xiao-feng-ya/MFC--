@@ -16,22 +16,40 @@
 	{
 		CreateDirectory(csPath,0);//不存在则创建
 	} 
-	CString aa;
-	aa=csPath+"\\图片";
 	//不存在 \\记录\\%Y-%m-%d\\图片则创建
-	if (!PathIsDirectory(aa))
+	if (!PathIsDirectory(csPath+"\\图片"))
 	{
-		CreateDirectory(aa,0);//不存在则创建
+		CreateDirectory(csPath+"\\图片",0);//不存在则创建
 	} 
-	CString bb;
-	bb=csPath+"\\表格";
 	//不存在 \\记录\\%Y-%m-%d\\表格 则创建
-	if (!PathIsDirectory(bb))
+	if (!PathIsDirectory(csPath+"\\表格"))
 	{
-		CreateDirectory(bb,0);//不存在则创建
+		CreateDirectory(csPath+"\\表格",0);//不存在则创建
 	} 
 
   按日期来新建和保存数据到execl的。
+  1在头文件加//PathFileExists()函数用到
+  #include <Shlwapi.h>
+  #pragma comment(lib,"Shlwapi.lib")
+  
+  2在stdafx.h添加（在 #include <afxcotrolbars.h>上面加）
+  #import "c:/program files/common files/system/ado/msado15.dll" no_namespace rename("EOF","adoEOF")
+  extern _ConnectionPtr m_pConnection;
+  extern _CommandPtr m_pCommand;
+  extern _RecordsetPtr m_pRecordset;
+  
+  3在stdafx.cpp中添加
+  _ConnectionPtr m_pConnection;
+  _CommandPtr m_pCommand;
+  _RecordsetPtr m_pRecordset;
+  
+  4在InitInatance()中添加（在.App里）
+   if(!AfxOleInit())
+        {
+         AfxMessageBox("OLE初始化错误");
+         return FALSE;
+         }
+	 
         //按时间来新命名和创建xls文件
 	CTime m_time;
 	m_time=CTime::GetCurrentTime();
