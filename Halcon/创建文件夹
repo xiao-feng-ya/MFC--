@@ -1,0 +1,59 @@
+  建立 记录//日期//图片,表格
+  获取日期
+  CTime time;
+	time=CTime::GetCurrentTime();
+	CString curdata=time.Format("%Y-%m-%d");
+  
+	CString csPath(TEXT("记录\\"));
+	//不存在图片的文件夹则创建
+	if (!PathIsDirectory(csPath))
+	{
+		CreateDirectory(csPath,0);//不存在则创建
+	} 
+	csPath+=curdata;
+	if (!PathIsDirectory(csPath))
+	{
+		CreateDirectory(csPath,0);//不存在则创建
+	} 
+	CString aa;
+	aa=csPath+"\\图片";
+	if (!PathIsDirectory(aa))
+	{
+		CreateDirectory(aa,0);//不存在则创建
+	} 
+	CString bb;
+	bb=csPath+"\\表格";
+	if (!PathIsDirectory(bb))
+	{
+		CreateDirectory(bb,0);//不存在则创建
+	} 
+
+
+
+
+
+
+
+
+
+删除文件夹（删除文件夹里的文件（不能有文件夹））
+CString csPath(TEXT("图片\\123"));
+	if (!PathIsDirectory(csPath))
+	{
+	} 
+	else
+	{
+		MessageBox("存在");
+		CFileFind fileFinder;
+		BOOL bFind = fileFinder.FindFile(csPath + _T("\\*.*"));
+		while (bFind)
+		{
+			bFind = fileFinder.FindNextFile();
+			if (fileFinder.IsDirectory()) //这里可以使用递归进行子文件夹的删除
+				continue;
+
+			CString strFilePath = fileFinder.GetFilePath();
+			DeleteFile(strFilePath);
+		}
+		::RemoveDirectory(csPath);		
+	}
