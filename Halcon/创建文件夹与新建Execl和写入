@@ -1,0 +1,176 @@
+  判断是否需要 建立 记录//日期//图片,表格
+        获取日期
+        CTime time;
+	time=CTime::GetCurrentTime();
+	CString curdata=time.Format("%Y-%m-%d");
+  
+        CString csPath(TEXT("记录\\"));
+	//不存在 \\记录 的文件夹则创建
+	if (!PathIsDirectory(csPath))
+	{
+		CreateDirectory(csPath,0);//不存在则创建
+	} 
+	csPath+=curdata;
+	//不存在 \\记录\\%Y-%m-%d则创建
+	if (!PathIsDirectory(csPath))
+	{
+		CreateDirectory(csPath,0);//不存在则创建
+	} 
+	CString aa;
+	aa=csPath+"\\图片";
+	//不存在 \\记录\\%Y-%m-%d\\图片则创建
+	if (!PathIsDirectory(aa))
+	{
+		CreateDirectory(aa,0);//不存在则创建
+	} 
+	CString bb;
+	bb=csPath+"\\表格";
+	//不存在 \\记录\\%Y-%m-%d\\表格 则创建
+	if (!PathIsDirectory(bb))
+	{
+		CreateDirectory(bb,0);//不存在则创建
+	} 
+
+  按日期来新建和保存数据到execl的。
+        //按时间来新命名和创建xls文件
+	CTime m_time;
+	m_time=CTime::GetCurrentTime();
+	CString strFile="记录//";
+	strFile+=m_time.Format("%Y-%m-%d");
+	strFile+="//表格//";	
+	strFile+=m_time.Format(_T("小方柄  %Y-%m-%d"));
+	strFile+=".xls";
+	BOOL Pathoff;//辅助判断是否存在过本日期的文件，便于判断是否需要添加创建新SHEEl。
+	if (PathFileExists(strFile))
+	{
+		//存在
+		Pathoff=TRUE;
+	} 
+	else
+	{
+		//不存在
+		Pathoff=FALSE;
+	}
+	CString sC;
+	sC.Format("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;"
+		"Extended Properties=Excel 8.0",strFile);
+
+	HRESULT hr;
+	try
+	{
+		//连表
+		hr=m_pConnection.CreateInstance(_T("ADODB.Connection"));//创建Connection对象
+		if (SUCCEEDED(hr))
+		{
+			hr=m_pConnection->Open((_bstr_t)sC,"","",adModeUnknown);//连接数据库
+		}
+		
+		//判断是否需要新建excel的页
+		if (Pathoff==FALSE)
+       {
+		m_pCommand.CreateInstance(_T("ADODB.Command"));
+		m_pCommand->ActiveConnection=m_pConnection;
+		//下面的句子用于写表头---" CREATE TABLE   页名(第1列名 类型,第2列名 类型,第3列名 类型,~~~)" varchar用于CString
+		m_pCommand->CommandText="CREATE TABLE MySheet(A int,B varchar, C int,D int,E int,具体时间 varchar)";
+		m_pCommand->Execute(NULL,NULL,adCmdText);
+	   }
+
+		m_pRecordset.CreateInstance(_T("ADODB.Recordset"));
+		m_pRecordset->Open("SELECT * FROM MySheet",_variant_t((IDispatch*)m_pConnection),adOpenKeyset,adLockOptimistic,adCmdText);
+		//写入操作
+		for (int i=0;i<3;++i)
+		{
+			m_pRecordset->AddNew();//开新行
+			m_pRecordset->Fields->GetItem("A")->Value=_variant_t(i);//写入列名为A的新行里
+			m_pRecordset->Fields->GetItem("B")->Value=_variant_t("中文");
+			//获取当前的时间写入
+		        m_time=CTime::GetCurrentTime();
+			m_pRecordset->Fields->GetItem("具体时间")->Value=_variant_t(m_time.Format(_T("%Y-%m-%d %H:%M:%S")));
+		    
+		}
+		m_pRecordset->Update();//更新新开的行
+		m_pRecordset->Close();
+		m_pConnection->Close();
+
+	}catch (_com_error e)
+	{
+		CString strMsg;
+		strMsg.Format(_T("错误描述：%s\n错误消息%s"), 
+			(LPCTSTR)e.Description(),
+			(LPCTSTR)e.ErrorMessage());
+		AfxMessageBox(strMsg);
+	}
+
+
+按具体地时间日期来新建Execl（具体到秒，每次使用都新建了）
+        CTime m_time;
+	m_time=CTime::GetCurrentTime();
+	CString strFile="记录//";
+	strFile+=m_time.Format("%Y-%m-%d");
+	strFile+="//表格//";	
+	strFile+=m_time.Format(_T("%Y-%m-%d %H点%M分%S秒 "));
+	strFile+=".xls";
+
+	CString sC;
+	sC.Format("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=%s;"
+		"Extended Properties=Excel 8.0",strFile);
+	HRESULT hr;
+	try
+	{
+		//连表
+		hr=m_pConnection.CreateInstance(_T("ADODB.Connection"));//创建Connection对象
+		if (SUCCEEDED(hr))
+		{
+			hr=m_pConnection->Open((_bstr_t)sC,"","",adModeUnknown);//连接数据库
+		}
+		//建表头
+		m_pCommand.CreateInstance(_T("ADODB.Command"));
+		m_pCommand->ActiveConnection=m_pConnection;
+		m_pCommand->CommandText="CREATE TABLE MySheet(A int,B varchar, C int,D int,E int,中文 int)";
+		m_pCommand->Execute(NULL,NULL,adCmdText);
+                //添加新的内容
+		m_pRecordset.CreateInstance(_T("ADODB.Recordset"));
+		m_pRecordset->Open("SELECT * FROM MySheet",_variant_t((IDispatch*)m_pConnection),adOpenKeyset,adLockOptimistic,adCmdText);
+		for (int i=0;i<3;++i)
+		{
+			m_pRecordset->AddNew();
+			m_pRecordset->Fields->GetItem("A")->Value=_variant_t(i);
+			m_pRecordset->Fields->GetItem("B")->Value=_variant_t("中文");
+		}
+		m_pRecordset->Update();
+		m_pRecordset->Close();
+		m_pConnection->Close();
+
+	}
+	catch (_com_error e)
+	{
+		CString strMsg;
+		strMsg.Format(_T("错误描述：%s\n错误消息%s"), 
+			(LPCTSTR)e.Description(),
+			(LPCTSTR)e.ErrorMessage());
+		AfxMessageBox(strMsg);
+	}
+
+
+
+删除文件夹（删除文件夹里的文件（不能有文件夹））
+CString csPath(TEXT("图片\\123"));
+	if (!PathIsDirectory(csPath))
+	{
+	} 
+	else
+	{
+		MessageBox("存在");
+		CFileFind fileFinder;
+		BOOL bFind = fileFinder.FindFile(csPath + _T("\\*.*"));
+		while (bFind)
+		{
+			bFind = fileFinder.FindNextFile();
+			if (fileFinder.IsDirectory()) //这里可以使用递归进行子文件夹的删除
+				continue;
+
+			CString strFilePath = fileFinder.GetFilePath();
+			DeleteFile(strFilePath);
+		}
+		::RemoveDirectory(csPath);		
+	}
