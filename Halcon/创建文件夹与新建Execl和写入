@@ -174,3 +174,10 @@ CString csPath(TEXT("图片\\123"));
 		}
 		::RemoveDirectory(csPath);		
 	}
+
+附：时间获取
+    CTime m_time;  
+    m_time=CTime::GetCurrentTime();             //获取当前时间日期  
+   CString m_strDate=m_time.Format(_T("%x"));          //格式化日期  
+   CString m_strTime=m_time.Format(_T("%X"));          //格式化时间  
+   CString m_strDateTime=m_time.Format(_T("%Y-%m-%d %H:%M:%S %A"));   //格式化日期时间  
