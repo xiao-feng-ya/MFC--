@@ -1,0 +1,60 @@
+volatile是一个类型修饰符（type specifier）.volatile的作用是作为指令关键字，确保本条指令不会因编译器的优化而省略，且要求每次直接读值。
+volatile的变量是说这变量可能会被意想不到地改变，这样，编译器就不会去假设这个变量的值了。
+精确地说就是，编译器在用到这个变量时必须每次都小心地重新读取这个变量的值，而不是使用保存在寄存器里的备份。下面是volatile变量的几个例子：
+1）并行设备的硬件寄存器（如：状态寄存器）
+2）一个中断服务子程序中会访问到的非自动变量（Non-automatic variables)
+3）多线程应用中被几个任务共享的变量
+这是区分C程序员和嵌入式系统程序员的最基本的问题：嵌入式系统程序员经常同硬件、中断、RTOS等等打交道，所有这些都要求使用volatile变量。不懂得volatile内容将会带来灾难。
+例：
+volatile BOOL m_monitor = FALSE;//监听线程控制符
+volatile BOOL m_Cam1 = FALSE;//Cam1线程控制符
+
+
+复选框
+勾选时...做某种算法
+不勾选时 做另一种算法
+if ( BST_CHECKED == IsDlgButtonChecked( IDC_CHECK1 ) )
+{
+// 勾选
+}
+else
+{
+}
+
+IDC_CHECK1是CheckBox控件。
+在MFC里怎样让checkbox在初始状态的时候就打上勾:
+
+
+
+  方法一:   
+
+  设该CheckBox控件ID为IDC_CHECK1,   
+
+  在Dialog类的OnInitDialog函数中//TODO处添加代码:   
+
+  ((CButton*)GetDlgItem(IDC_CHECK1))->SetCheck(BST_CHECKED);   
+
+  方法二:   
+
+  为该控件添加BOOL值型控件成员变量m_Check1,在Dialog类的构造函数中将m_Check1=TRUE;   
+
+  方法三:   
+
+  为该控件添加CButton Control型控件成员变量m_CheckCtrl1,   
+
+  在Dialog类的OnInitDialog函数中//TODO处添加代码:   
+
+  m_CheckCtrl1.SetCheck(BST_CHECKED);
+
+GetDlgItem(IDC_XXX)->EnableWindow(FALSE);//变灰，不能使用
+GetDlgItem(IDC_XXX)->EnableWindow(TRUE);//恢复正常
+
+MFC中复选框CheckBox的基类是CButton,切忌啦！！！
+
+画刷
+m_brush1 = NULL;
+if (m_brush1)
+     DeleteObject(m_brush1);         
+m_brush1 = CreateSolidBrush(RGB(255, 255, 255)); // 根据需要设置 
+SetDlgItemText( IDC_EDIT1, "待检测");
+
