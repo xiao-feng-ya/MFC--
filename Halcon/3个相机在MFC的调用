@@ -241,4 +241,11 @@ void CcodeDlg::Icamera3()
 	}
 
     close_all_framegrabbers();//关闭全部相机
-  
+    ****************************************************************************************************************************
+    对于网口的；
+    用
+    info_framegrabber("DirectShow","device",&Information,&Value);
+    open_framegrabber("DirectShow",1,1,0,0,0,0,"default",-1,"default",-1,"default","default",HTuple(Value[0]),-1,-1,&AcqHandleX1);
+    open_framegrabber("DirectShow",1,1,0,0,0,0,"default",-1,"default",-1,"default","default",HTuple(Value[1]),-1,-1,&AcqHandleX1);
+    *******************************************************************************************************8
+    
