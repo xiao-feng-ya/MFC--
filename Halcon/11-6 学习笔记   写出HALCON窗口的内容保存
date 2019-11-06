@@ -1,0 +1,20 @@
+dump_window( 窗口，“文件类型”，“路径”)     保存窗口的内容到路径
+dump_window_image(Image,窗口)    将窗口的内容保存到目标图片中
+
+invert_image(ImageI,ImageO)   将图片取反
+emphasize(ImageI,ImageO,W,H,1)    增强图像对比度
+scale_image(ImageI,ImageO,a,b)  改变图像的对比度，y=ax+b;
+
+write_image(ImageI,'bmp',255,路径）  保存图片
+
+min_max_gray(Image,Image,0,Min,Max,Range)  求图片区域的最大最小灰度
+scale_image_max(I,O) 扩大灰度值范围到0-255
+
+equ_histo_image(I,O) 直方图均衡化
+
+gauss_distribution(20,Distribution)创建噪声
+add_noise_distribution(I,O,Distribution)添加噪声到图片
+
+mean_image() 均值滤波
+median_image() 中值滤波
+soble_amp() 
