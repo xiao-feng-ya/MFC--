@@ -18,3 +18,9 @@ add_noise_distribution(I,O,Distribution)添加噪声到图片
 mean_image() 均值滤波
 median_image() 中值滤波
 soble_amp() 
+skeleton() 计算区域骨架
+gen_contours_skeleton_xld() 将骨架转换为XLD轮廓。
+prewitt_amp() 使用基尔希算子检测边缘(振幅)。
+laplace_of_gauss() 高斯函数的拉普拉斯变换。
+zero_crossing() 提取0交叉
+edges_sub_pix() 使用Deriche, Lanser, Shen或Canny过滤器提取亚像素精确的边缘。
