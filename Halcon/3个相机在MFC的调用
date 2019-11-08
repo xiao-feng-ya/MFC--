@@ -178,18 +178,18 @@ void CcodeDlg::Icamera3()
 	case 1: 
 		// 一号相机视频流的采集，可加预处理     
 		grab_image_async(&Image1,AcqHandle1,-1);
-		clear_window(hv_WindowHandle1);
+		//clear_window(hv_WindowHandle1);
 		disp_obj(Image1,hv_WindowHandle1);
 		break;      
 	case 2:      
 		// 如果收到ID为2的定时器的消息则调用函数      
 		grab_image_async(&Image2,AcqHandle2,-1);
-		clear_window(hv_WindowHandle2);
+		//clear_window(hv_WindowHandle2);
 		disp_obj(Image2,hv_WindowHandle2);   
 		break;     
 	case 3:
 		grab_image_async(&Image3,AcqHandle3,-1);
-		clear_window(hv_WindowHandle3);
+		//clear_window(hv_WindowHandle3);
 		disp_obj(Image3,hv_WindowHandle3);  
 		break;
 	default:      
