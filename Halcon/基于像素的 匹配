@@ -1,0 +1,49 @@
+这个示例程序展示了如何使用HALCON的基于像素的
+匹配。特别说明了该方法的鲁棒性
+线性照明的变化。训练以良好的形象进行
+*照明。在曝光时间变化的图像中进行匹配
+从非常短到非常长。
+
+* This example program shows how to use HALCON's correlation-based
+* matching. In particular it demonstrates the robustness of this method against
+* linear illumination changes.  The training is performed in an image with good
+* illumination.  The matching is applied in images where the exposure time varies
+* extremely from very short to very long.
+read_image (Image, 'cap_exposure/cap_exposure_03')
+get_image_size (Image, Width, Height)
+dev_close_window ()
+dev_open_window (0, 0, Width, Height, 'black', WindowHandle)
+dev_update_window ('off')
+gen_circle (Circle, 246, 336, 150)
+area_center (Circle, Area, RowRef, ColumnRef)
+reduce_domain (Image, Circle, ImageReduced)
+抠模板
+create_ncc_model (ImageReduced, 'auto', 0, 0, 'auto', 'use_polarity', ModelID)
+dev_set_draw ('margin')
+dev_display (Image)
+dev_display (Circle)
+stop ()
+Rows := []
+Cols := []
+for J := 1 to 10 by 1
+    read_image (Image, 'cap_exposure/cap_exposure_'+J$'02')
+   找模板
+   find_ncc_model (Image, ModelID, 0, 0, 0.5, 1, 0.5, 'true', 0, Row, Column, Angle, Score)
+    从点和角度计算刚性仿射变换。
+    vector_angle_to_rigid (RowRef, ColumnRef, 0, Row, Column, 0, HomMat2D)
+    对原区域进行反射变换找到匹配后的区域
+    affine_trans_region (Circle, RegionAffineTrans, HomMat2D, 'false')
+    Rows := [Rows,Row]
+    Cols := [Cols,Column]
+    dev_display (Image)
+    dev_display (RegionAffineTrans)
+    stop ()
+endfor
+* Compute the standard deviation of the found positions.  If the individual
+* positions in Rows and Cols are examined, it can be seen that the standard
+* deviation is caused mainly by the last four images, which are severely
+* overexposed.
+*deviation()求标准差
+StdDevRows := deviation(Rows)
+StdDevCols := deviation(Cols)
+clear_ncc_model (ModelID)
