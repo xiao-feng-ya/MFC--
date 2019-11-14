@@ -1,0 +1,4 @@
+参考https://blog.csdn.net/weixin_42274148/article/details/85321091
+我试了下，发现需要把 opencv_world401.dll和opencv_world401d.dll 这两个文件放在C:\Windows\System32这个文件夹里。 
+如果是放在 C:\Windows\SysWOW64这个文件夹中 会报错 找不到opencv_world401d.dll 。
+其中401换成相应的版本
