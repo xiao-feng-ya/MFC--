@@ -1,18 +1,17 @@
 在头文件
-static UINT ThreadZ1(LPVOID* pParam);
-CWinThread* ThreadXX1;
+static UINT ThreadZ1(LPVOID* pParam);  //线程函数 ThreadZ1为线程函数名
+CWinThread* ThreadXX1;  //线程名1
 
 
 在源文件
-
-
-开启线程
-ThreadXX1=AfxBeginThread((AFX_THREADPROC)ThreadZ1, this);
+ThreadXX1=AfxBeginThread((AFX_THREADPROC)ThreadZ1, this);//开启线程
 ThreadXX1->SuspendThread();//   让线程等待
 ThreadXX1->ResumeThread();//    唤醒暂停的线程
 TerminateThread(ThreadXX1->m_hThread, 0);    //结束线程
 
 //线程函数
+//写法1，用TerminateThread(ThreadXX1->m_hThread, 0);    //结束线程
+//线程函数只写工作事件
 UINT CcsDlg::ThreadZ1(LPVOID* pParam)
 {
 	while(TRUE)
@@ -23,9 +22,36 @@ UINT CcsDlg::ThreadZ1(LPVOID* pParam)
 	return 0;
 }
 
+//写法2  推荐写法
+int n = 0;
+CString strn;
+BOOL ThreadKill = FALSE;//用于线程注销
+UINT CThreadDlg::线程函数名(LPVOID* pParam)
+{
+	CThreadDlg* ap1 = (CThreadDlg*)pParam;//获取主类指针，在多线程类中使用主类变量需要使用指针ap1->
+	while (1)
+	{
+		if (ThreadKill)
+		{
+			DWORD dwExitCode;//指定线程的退出代码
+			GetExitCodeThread(ap1->Thread1, &dwExitCode);//获取线程1的退出代码
+			AfxEndThread(dwExitCode, TRUE);//退出线程
+		}
+		else
+		{       //线程的工作事件
+			n++;
+			strn.Format(_T("%d"), n);
+			ap1->SetDlgItemText(IDC_EDIT1, strn);
+			Sleep(30);
+		}
+	}	return 0;
+}
+线程关闭方法https://blog.csdn.net/u010246665/article/details/51115417
+
+//判断线程是否开启
 //只有开启过该线程，才能判断线程状态
-DWORD code;
-GetExitCodeThread(XX1->m_hThread, &code);
+DWORD code;//指定线程的退出代码
+GetExitCodeThread(XX1->m_hThread, &code);//获取线程1的退出代码
 if (code == STILL_ACTIVE) {
     //线程仍在执行
 		MessageBox(_T("开"));
@@ -34,3 +60,43 @@ else {
 		MessageBox(_T("关"));
 		//线程停止执行,结束线程
 	}
+	
+MFC中的临界区类
+MFC把上面的操作封装成一个类CCriticalSection,使用函数Lock与Unlock表示进入和离开临界区.上锁和解锁的说法是更符合我们的习惯思维的.
+
+#include "afxmt.h" //需要添加该头文件引用
+头文件加
+CCriticalSection g_criSection;
+源文件加
+g_criSection.Lock()//给所有使用的资源上锁
+g_criSection.Unlock(); //给使用的资源解锁
+例如
+UINT CThreadDlg::MyThread2(LPVOID* pParam)
+{
+	CThreadDlg* ap2 = (CThreadDlg*)pParam;//获取主类指针，在多线程类中使用主类变量需要使用指针ap1->
+	while (1)
+	{
+		if (ThreadKill)
+		{
+			DWORD dwExitCode;//指定线程的退出代码
+			GetExitCodeThread(ap2->Thread2, &dwExitCode);//获取线程1的退出代码
+			AfxEndThread(dwExitCode, TRUE);//退出线程
+		}
+		else
+		{
+			ap2->g_criSection.Lock();//给所有使用的资源上锁
+			//n++;
+			strn.Format(_T("%d"), 2*n);
+			strn += "T";
+			ap2->SetDlgItemText(IDC_EDIT_2, strn);	
+			if (n % 2 == 1)
+			{
+				n++;
+			}
+			ap2->g_criSection.Unlock(); //给使用的资源解锁
+			Sleep(30);
+			//break;
+		}
+	}	return 0;
+}
+	
