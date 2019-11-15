@@ -190,3 +190,13 @@ std::vector<int> myvector;
 七、重载函数
 
 1.重载了操作符"=="  '!='  '<'  '<='  '>'  '>=':对于==来说，首先比较它们的大小，若size相等，则依次比较元素；对于其他运算符，依次比较元素。c==d;
+
+        动态二维数组
+         int m=2;
+	vector<vector <int> > ivec(m);
+	ivec[0].push_back(23);
+	ivec[0].push_back(22);
+	ivec[1].push_back(1);
+	ivec[1].push_back(2);
+	ivec[1].push_back(1);
+	ivec[1].push_back(2);
