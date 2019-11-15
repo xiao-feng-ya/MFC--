@@ -5,6 +5,14 @@ invert_image(ImageI,ImageO)   将图片取反
 emphasize(ImageI,ImageO,W,H,1)    增强图像对比度
 scale_image(ImageI,ImageO,a,b)  改变图像的对比度，y=ax+b;
 
+min_max_gray (Image, Image, 0, Min, Max, Range)
+Mult := 255.0 / (Max - Min)
+Add := -Mult * Min
+scale_image (Image, Image2, Mult, Add)
+scale_image_max (Image, ImageScaleMax)
+
+
+
 write_image(ImageI,'bmp',255,路径）  保存图片
 
 min_max_gray(Image,Image,0,Min,Max,Range)  求图片区域的最大最小灰度
